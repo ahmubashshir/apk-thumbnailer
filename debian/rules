@@ -1,0 +1,5 @@
+#!/usr/bin/make -f
+clean:
+	rm -rf debian/.debhelper debian/folder-thumbnailer debian/folder-thumbnailer.substvars debian/files
+%:
+	dh $@

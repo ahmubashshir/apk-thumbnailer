@@ -1,0 +1,5 @@
+.debhelper
+apk-thumbnailer
+*.substvars
+files
+.debhelper

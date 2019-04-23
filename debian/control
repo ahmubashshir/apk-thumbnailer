@@ -1,0 +1,17 @@
+Source: apk-thumbnailer
+Maintainer: Ahmad Hasan Mubashshir <ahmubashshir@gmail.com>
+Homepage: http://github.com/ahmubashshir/apk-thumbnailer
+Standards-Version: 4.1.4
+Priority: optional
+Build-Depends: debhelper ( >= 11 )
+Section: utils
+
+Package: apk-thumbnailer
+Section: utils
+Priority: optional
+Architecture:all
+Depends: ${misc:Depends},tumbler,unzip,aapt,netpbm,gvfs-bin,bash ( >= 3 )
+Homepage: http://github.com/ahmubashshir/apk-thumbnailer
+Description: Create Thumbnails from android packages.
+ It creates thumbnails of android apk files.
+
