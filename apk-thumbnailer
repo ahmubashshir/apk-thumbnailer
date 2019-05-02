@@ -8,7 +8,7 @@
 # Depends on :
 #   * unzip
 #   * aapt
-#   * pngtopnm, pnmtopng, pnmcrop, pnmpad, pnmscalefixed and pnmcomp (netpbm package)
+#   * convert (imagemagick package)
 # Parameters :
 #   $1 - path of APK archive
 #   $2 - path of generated thumbnail
@@ -22,59 +22,38 @@
 #   07/10/2017, V3.1 - Speedup with netpbm tools
 #   15/12/2018, V3.2 - Rework for bubblewrap compatibility
 # ---------------------------------------------------
-
 # check tools availability
 command -v aapt >/dev/null 2>&1 || { echo "[error] aapt missing"; exit 1; }
 command -v unzip >/dev/null 2>&1 || { echo "[error] unzip missing"; exit 1; }
-command -v pbmtextps >/dev/null 2>&1 || { echo "[error] pbmtextps missing"; exit 1; }
-command -v pnmcrop >/dev/null 2>&1 || { echo "[error] pnmcrop missing"; exit 1; }
-command -v pnmpad >/dev/null 2>&1 || { echo "[error] pnmpad missing"; exit 1; }
-command -v pngtopnm >/dev/null 2>&1 || { echo "[error] pngtopnm missing"; exit 1; }
-command -v pnmscalefixed >/dev/null 2>&1 || { echo "[error] pnmscalefixed missing"; exit 1; }
-command -v pnmcomp >/dev/null 2>&1 || { echo "[error] pnmcomp missing"; exit 1; }
-command -v pnmtopng >/dev/null 2>&1 || { echo "[error] pnmtopng missing"; exit 1; }
-
+command -v convert >/dev/null 2>&1 || { echo "[error] convert missing"; exit 1; }
 # check params
 [ "$3" = "" ] && { echo "[error] 3 params are needed : file file-thumb thumb-size"; exit 1; }
-
 # set to no to remove version number on the icon
 DISPLAY_VERSION="yes"
-
 # get parameters
 FILE_LOCAL="$1"
 FILE_THUMB="$2"
 SIZE="$3"
-
 # generate temporary local filename
-TMP_PNM=$(mktemp -t "thumb-apk-XXXXXXXX.pnm")
-
 # get application icon
 ICON=$(aapt d badging "${FILE_LOCAL}" | grep "application-icon" | sed 's/^.*icon-\(.*\):.\(.*\).$/\2/' | tail -1)
-
-# if icon exists, extract icon & generate thumbnail 
+# if icon exists, extract icon & generate thumbnail
 if [ "$ICON" != "" ]
-then 
+then
 	# if needed, add version display options
 	if [ "$DISPLAY_VERSION" = "yes" ]
 	then
 		# get version
 		VERSION=$(aapt d badging "${FILE_LOCAL}" | grep "versionName=" | sed 's/^.*versionName=.\([0-9.]*\).*$/\1/')
-
-		# calculate optimum font size
-		FONT_SIZE=$((${SIZE} / 10 + 1))
-
-		# generate version image
-		pbmtextps -fontsize ${FONT_SIZE} "${VERSION}" | pnmcrop - | pnmpad -white -left 4 -right 4 -top 4 -bottom 4 - | pnmpad -black -left 2 -right 2 -top 2 -bottom 2 - > "${TMP_PNM}"
-
-		# generate icon including version number
-		unzip -p "${FILE_LOCAL}" "${ICON}" | pngtopnm - | pnmscalefixed -xysize ${SIZE} ${SIZE} - | pnmcomp -align center -valign bottom "${TMP_PNM}" - | pnmtopng > "${FILE_THUMB}"
-
-	# else, no version needed
-	else
-		# generate plain icon without version number
-		unzip -p "${FILE_LOCAL}" "${ICON}" | pngtopnm - | pnmscalefixed -xysize ${SIZE} ${SIZE} - | pnmtopng -downscale -compression 0 - > "${FILE_THUMB}"
+			# calculate optimum font size
+		FONT_SIZE=$((${SIZE} / 6 + 1))
+			# generate icon including version number
+		unzip -p "${FILE_LOCAL}" "${ICON}" |convert -resize $SIZE png:- -gravity South -pointsize $FONT_SIZE -undercolor '#ffffff' -annotate +0+0 " $VERSION" "${FILE_THUMB}"
+			# else, no version needed
+		else
+			# generate plain icon without version number
+			unzip -p "${FILE_LOCAL}" "${ICON}" | convert -resize $SIZE png:- "${FILE_THUMB}"
+		fi
 	fi
-fi
-
-# remove temporary local file
-rm -f "${TMP_PNM}"
+		# remove temporary local file
+	rm -f "${TMP_PNM}"
