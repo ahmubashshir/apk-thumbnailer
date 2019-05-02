@@ -1,3 +1,9 @@
+apk-thumbnailer (1.0.0ubuntu1) bionic; urgency=medium
+
+  * Removed netpbm dependency.
+
+ -- Ahmad Hasan Mubashshir <ahmubashshir@gmail.com>  Thu, 02 May 2019 20:17:53 +0600
+
 apk-thumbnailer (1.0.0) bionic; urgency=medium
 
   * Initial commit.
