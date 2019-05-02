@@ -10,7 +10,7 @@ Package: apk-thumbnailer
 Section: utils
 Priority: optional
 Architecture:all
-Depends: ${misc:Depends},tumbler,unzip,aapt,netpbm,gvfs-bin,bash ( >= 3 )
+Depends: ${misc:Depends},tumbler,unzip,aapt,imagemagick-6.q16 | imagemagick-6.q16hdri | graphicsmagick-imagemagick-compat,gvfs-bin,bash ( >= 3 )
 Homepage: http://github.com/ahmubashshir/apk-thumbnailer
 Description: Create Thumbnails from android packages.
  It creates thumbnails of android apk files.
